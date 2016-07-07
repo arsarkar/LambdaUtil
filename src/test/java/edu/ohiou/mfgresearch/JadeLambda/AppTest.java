@@ -1,38 +1,55 @@
 package edu.ohiou.mfgresearch.JadeLambda;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.awt.SystemColor;
+import java.util.stream.Stream;
+
+import org.junit.Test;
+
+import edu.ohiou.mfgresearch.lambda.Anything;
+import edu.ohiou.mfgresearch.lambda.Failure;
+import edu.ohiou.mfgresearch.lambda.Success;
+import junit.framework.Assert;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
+public class AppTest
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+	@Test
+	public void onSucessMap1(){
+		Anything.of(String::new).map(t->{
+			return 5.0;
+		}).onSuccess(c->org.junit.Assert.assertEquals((Double)5.0, (Double)c));
+	}
+	
+	@Test
+	public void onSucessFMap1(){
+		Anything.of(String::new).fMap2Stream(t->{
+			return Stream.of(Anything.of(()->5.0), 
+							 Anything.of(()->6.0), 
+							 Anything.of(()->7.0));
+		})
+		.forEach(d->d.onSuccess(System.out::println));
+	}
+	
+	@Test
+	public void onSuccess3(){
+		Anything.of(String::new).fMap2Stream(t->{
+			return Stream.of(Anything.of(()->5.0), 
+							 Anything.of(()->6.0), 
+							 Anything.of(()->7.0));
+		})
+		.map(d->d.fMap(v->{
+			return (v%2==0) ? new Success<Double>(v) :new Failure<Double>(new Exception("not even"));
+		}))
+		.map(d->d.onFailure(e->System.out.println(e.getMessage())))
+		.forEach(d->d.onSuccess(System.out::println));
+		
+	}
+	
+	@Test
+	public void testComposition1(){
+		
+	}
+   
 }
