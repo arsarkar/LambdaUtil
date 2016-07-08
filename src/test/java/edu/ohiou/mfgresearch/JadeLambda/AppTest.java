@@ -1,6 +1,5 @@
 package edu.ohiou.mfgresearch.JadeLambda;
 
-import java.awt.SystemColor;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -8,7 +7,6 @@ import org.junit.Test;
 import edu.ohiou.mfgresearch.lambda.Anything;
 import edu.ohiou.mfgresearch.lambda.Failure;
 import edu.ohiou.mfgresearch.lambda.Success;
-import junit.framework.Assert;
 
 /**
  * Unit test for simple App.

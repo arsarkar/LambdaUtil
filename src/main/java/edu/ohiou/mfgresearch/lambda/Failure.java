@@ -62,7 +62,7 @@ public class Failure<T> extends Anything<T> {
 	@Override
 	public boolean isSuccess() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 	
 

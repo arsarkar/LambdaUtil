@@ -29,7 +29,7 @@ public abstract class Anything<T> {
 	}
 	
 	public static <T> Anything<T> of(T obj){
-		return new Success<T>(obj);
+		return obj!=null?new Success<T>(obj):new Failure<T>(new NullPointerException("Object is null"));
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -89,7 +89,7 @@ public class Success<T> extends Anything<T> {
 	@Override
 	public boolean isSuccess() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }
