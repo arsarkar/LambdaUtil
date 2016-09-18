@@ -34,7 +34,7 @@ public abstract class Anything<T> {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> Stream<Anything<T>> of(T... objs){
-		return Stream.of(objs).flatMap(Anything::of);
+		return Stream.of(objs).map(o->Anything.of(o));
 	}
 	
 	public abstract <U> Anything<U> map(Func<T, U> f);
