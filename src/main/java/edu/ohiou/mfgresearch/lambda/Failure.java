@@ -7,7 +7,7 @@ import edu.ohiou.mfgresearch.lambda.functions.Cons;
 import edu.ohiou.mfgresearch.lambda.functions.Func;
 import edu.ohiou.mfgresearch.lambda.functions.Pred;
 
-public class Failure<T> extends Anything<T> {
+public class Failure<T> extends Algo<T> {
 	
 	private Exception exception;
 	
@@ -27,17 +27,17 @@ public class Failure<T> extends Anything<T> {
 	}
 
 	@Override
-	public <U> Anything<U> fMap(Func<T, Anything<U>> f) {
-		return new Failure<U>(exception);
+	public <U> Omni<U> fMap(Func<T, Omni<U>> f) {
+		return Omni.nihil();
 	}
 
 	@Override
-	public <U> Stream<Anything<U>> fMap2Stream(Func<T, Stream<Anything<U>>> f) {
+	public <U> Stream<Algo<U>> fMap2Stream(Func<T, Stream<Algo<U>>> f) {
 		return Stream.of(new Failure<U>(exception));
 	}
 
 	@Override
-	public Anything<T> filter(Pred<T> p) {
+	public Algo<T> filter(Pred<T> p) {
 		return new Failure<T>(exception);
 	}
 	
@@ -63,6 +63,11 @@ public class Failure<T> extends Anything<T> {
 	public boolean isSuccess() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Algo<T> select(Pred<T> p, Cons<T> c) {
+		return new Failure<T>(exception);
 	}
 	
 
