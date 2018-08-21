@@ -7,7 +7,7 @@ import edu.ohiou.mfgresearch.lambda.functions.Cons;
 import edu.ohiou.mfgresearch.lambda.functions.Func;
 import edu.ohiou.mfgresearch.lambda.functions.Pred;
 
-public class Failure<T> extends Algo<T> {
+public class Failure<T> extends Uni<T> {
 	
 	private Exception exception;
 	
@@ -32,12 +32,12 @@ public class Failure<T> extends Algo<T> {
 	}
 
 	@Override
-	public <U> Stream<Algo<U>> fMap2Stream(Func<T, Stream<Algo<U>>> f) {
+	public <U> Stream<Uni<U>> fMap2Stream(Func<T, Stream<Uni<U>>> f) {
 		return Stream.of(new Failure<U>(exception));
 	}
 
 	@Override
-	public Algo<T> filter(Pred<T> p) {
+	public Uni<T> filter(Pred<T> p) {
 		return new Failure<T>(exception);
 	}
 	
@@ -66,7 +66,7 @@ public class Failure<T> extends Algo<T> {
 	}
 
 	@Override
-	public Algo<T> select(Pred<T> p, Cons<T> c) {
+	public Uni<T> select(Pred<T> p, Cons<T> c) {
 		return new Failure<T>(exception);
 	}
 	

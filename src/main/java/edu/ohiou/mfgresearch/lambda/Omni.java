@@ -3,8 +3,11 @@ package edu.ohiou.mfgresearch.lambda;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.hamcrest.core.IsInstanceOf;
 
 import edu.ohiou.mfgresearch.lambda.functions.Cons;
 import edu.ohiou.mfgresearch.lambda.functions.Func;
@@ -12,18 +15,18 @@ import edu.ohiou.mfgresearch.lambda.functions.Pred;
 
 public class Omni<T> {
 
-	List<Algo<T>> algos;
+	List<Uni<T>> algos;
 
 	protected Omni(){
-		algos = new LinkedList<Algo<T>>();
+		algos = new LinkedList<Uni<T>>();
 	}
-	
+
 	/**
 	 * constructor accepting a list of items
 	 * already wrapped in Algo
 	 * @param collection
 	 */
-	protected Omni(List<Algo<T>> collection){
+	protected Omni(List<Uni<T>> collection){
 		algos = collection;
 	}
 
@@ -33,24 +36,24 @@ public class Omni<T> {
 	 * @param collection
 	 */
 	public static <T> Omni<T> of(List<T> collection){
-		List<Algo<T>> set =
-		collection.stream()
-					.map(Algo::of)
-					.collect(Collectors.toList());
+		List<Uni<T>> set =
+				collection.stream()
+				.map(Uni::of)
+				.collect(Collectors.toList());
 		return new Omni<T>(set);
 	}
-	
+
 	/**
 	 * Returns an empty Omni, which is represented
 	 * by just one Failure
 	 * @return
 	 */
 	public static <T> Omni<T> nihil(){
-		List<Algo<T>> nil = new LinkedList<Algo<T>>();
+		List<Uni<T>> nil = new LinkedList<Uni<T>>();
 		nil.add(new Failure<T>(new Exception("nihil")));
 		return new Omni<T>(nil);
 	}
-	
+
 	/**
 	 * Supplied consumer c consumes every "Success" element
 	 * Failure elements are returned as it is 
@@ -59,10 +62,10 @@ public class Omni<T> {
 	 * @return
 	 */
 	public Omni<T> set(Cons<T> c){
-		List<Algo<T>> res =
-		algos.stream()
-			.map(o->o.set(c))
-			.collect(Collectors.toList());
+		List<Uni<T>> res =
+				algos.stream()
+				.map(o->o.set(c))
+				.collect(Collectors.toList());
 		return new Omni<T>(res);
 	}
 
@@ -73,23 +76,23 @@ public class Omni<T> {
 	 * @return
 	 */
 	public Omni<T> filter(Pred<T> p) {
-		List<Algo<T>> res =
+		List<Uni<T>> res =
 				algos.stream()
-					.map(o->o.filter(p))
-					.filter(o->o instanceof Success)
-					.collect(Collectors.toList());
+				.map(o->o.filter(p))
+				.filter(o->o instanceof Success)
+				.collect(Collectors.toList());
 		return new Omni<T>(res);
 	}
-	
+
 	/**
 	 * Monadic map method 
 	 * @param f
 	 * @return
 	 */
 	public <R> Omni<R> map(Func<T,R> f){
-		List<Algo<R>> res =
-		algos.stream()
-			 .map(o->o.map(f))
+		List<Uni<R>> res =
+				algos.stream()
+				.map(o->o.map(f))
 				.collect(Collectors.toList());		
 		return new Omni<R>(res);
 	}
@@ -100,35 +103,116 @@ public class Omni<T> {
 	 * @return
 	 */
 	public <R> Omni<R> fMap(Func<T, Omni<R>> f){
-		List<Algo<R>> res =
+		List<Uni<R>> res =
 				algos.stream()
-					.flatMap(o->{
-						Omni<R> res1 = null;
-						try {
-							res1 = f.apply(o.get());
-						} catch (Exception e) {
-							return Stream.of(new Failure<R>(e));
-						}
-						return res1.toStream();
-					})
-					.collect(Collectors.toList());	
-		
+				.flatMap(o->{
+					Omni<R> res1 = null;
+					try {
+						res1 = f.apply(o.get());
+					} catch (Exception e) {
+						return Stream.of(new Failure<R>(e));
+					}
+					return res1.toStream();
+				})
+				.collect(Collectors.toList());	
+
 		return new Omni<R>(res);
-		
+
+	}
+
+	/**
+	 * Monadic select cons
+	 * applies the given function on each element if the predicate is true
+	 * @param p
+	 * @param f
+	 * @return
+	 */
+	public Omni<T> select(Pred<T> p, Cons<T> c){
+
+		for(Uni<T> o: algos){
+				if(o instanceof Success){
+					if(o.filter(p) instanceof Success){
+						o.set(c);	
+					}
+				}
+			}
+//mysterious problem while using the following code
+//		algos.stream()
+//			 .map(o->o.filter(p))
+//			 .filter(o->o instanceof Success)
+//			 .map(o->o.set(c));
+		return this;
+	}
+
+	/**
+	 * Monadic select map
+	 * applies the given function on each element if the predicate is true
+	 * @param p
+	 * @param f
+	 * @return
+	 */
+	public <R> Omni<R> selectMap(Pred<T> p, Func<T, R> f){
+		List<Uni<R>> res = new LinkedList<Uni<R>>();
+				for(Uni<T> o: algos){
+					if(o instanceof Success){
+						if(o.filter(p) instanceof Success){
+							res.add(o.map(f));	
+						}
+					}
+				}
+		return new Omni<R>(res);
 	}
 	
+	/**
+	 * Find element by index
+	 * @param index
+	 * @return
+	 */
+	public Uni<T> find(int index){
+		try{
+			return Uni.of(algos.get(index).get());			
+		}
+		catch (IndexOutOfBoundsException e) {
+			return new Failure<T>(e);
+		}
+	}
 	
-	
+	/**
+	 * Find the first element matching the given predicate 
+	 * @param index
+	 * @return
+	 */
+	public Uni<T> find(Pred<T> p){
+		try{
+			for(Uni<T> o: algos){
+				if(o instanceof Success){
+					if(o.filter(p) instanceof Success){
+						return new Success<T>(o.get());	
+					}
+				}
+			}		
+		}
+		catch (IndexOutOfBoundsException e) {
+			return new Failure<T>(e);
+		}
+		return new Failure<T>(new NoSuchElementException("No element matched the given predicate!"));
+	}
+
+	/**
+	 * immutable joining of two Omni
+	 * @param omni
+	 * @return
+	 */
 	public Omni<T> add(Omni<T> omni){
 		algos.addAll(omni.toList());
 		return new Omni<T>(algos);
 	}
 
-	public Stream<Algo<T>> toStream(){
+	public Stream<Uni<T>> toStream(){
 		return algos.stream();
 	}
 
-	public List<Algo<T>> toList(){
+	public List<Uni<T>> toList(){
 		return algos;
 	}
 }

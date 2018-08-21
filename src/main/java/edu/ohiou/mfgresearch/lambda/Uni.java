@@ -8,19 +8,19 @@ import edu.ohiou.mfgresearch.lambda.functions.Func;
 import edu.ohiou.mfgresearch.lambda.functions.Pred;
 import edu.ohiou.mfgresearch.lambda.functions.Suppl;
 
-public abstract class Algo<T> {
+public abstract class Uni<T> {
 	
 	protected T object;
 	
-	protected Algo(){
+	protected Uni(){
 		
 	}
 	
-	protected Algo(T obj){
+	protected Uni(T obj){
 		this.object = obj;
 	}
 	
-	public static <T> Algo<T> of(Suppl<T> s){
+	public static <T> Uni<T> of(Suppl<T> s){
 		try {
 			return new Success<T>(s.get());
 		} catch (Exception e) {
@@ -28,28 +28,28 @@ public abstract class Algo<T> {
 		}
 	}
 	
-	public static <T> Algo<T> of(T obj){
+	public static <T> Uni<T> of(T obj){
 		return obj!=null?new Success<T>(obj):new Failure<T>(new NullPointerException("Object is null"));
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Stream<Algo<T>> of(T... objs){
-		return Stream.of(objs).map(o->Algo.of(o));
+	public static <T> Stream<Uni<T>> of(T... objs){
+		return Stream.of(objs).map(o->Uni.of(o));
 	}
 	
-	public abstract <U> Algo<U> map(Func<T, U> f);
+	public abstract <U> Uni<U> map(Func<T, U> f);
 	
 	public abstract <U> Omni<U> fMap(Func<T, Omni<U>> f);
 	
-	public abstract <U> Stream<Algo<U>> fMap2Stream(Func<T, Stream<Algo<U>>> f);
+	public abstract <U> Stream<Uni<U>> fMap2Stream(Func<T, Stream<Uni<U>>> f);
 	
-	public abstract Algo<T> filter(Pred<T> p);
+	public abstract Uni<T> filter(Pred<T> p);
 	
-	public abstract Algo<T> set(Cons<T> c);
+	public abstract Uni<T> set(Cons<T> c);
 
-	public abstract Algo<T> select(Pred<T> p, Cons<T> c);
+	public abstract Uni<T> select(Pred<T> p, Cons<T> c);
 	
-	public abstract Algo<T> onFailure(Consumer<Exception> c);
+	public abstract Uni<T> onFailure(Consumer<Exception> c);
 	
 	public abstract void onSuccess(Consumer<T> c);
 	

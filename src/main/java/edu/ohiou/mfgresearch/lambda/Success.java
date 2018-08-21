@@ -7,7 +7,7 @@ import edu.ohiou.mfgresearch.lambda.functions.Cons;
 import edu.ohiou.mfgresearch.lambda.functions.Func;
 import edu.ohiou.mfgresearch.lambda.functions.Pred;
 
-public class Success<T> extends Algo<T> {
+public class Success<T> extends Uni<T> {
 	
 	public Success(T obj){
 		super(obj);
@@ -19,7 +19,7 @@ public class Success<T> extends Algo<T> {
 	}
 
 	@Override
-	public <U> Algo<U> map(Func<T, U> f) {
+	public <U> Uni<U> map(Func<T, U> f) {
 		try {
 			return new Success<U>(f.apply(object));
 		} catch (Exception e) {
@@ -44,7 +44,7 @@ public class Success<T> extends Algo<T> {
 
 
 	@Override
-	public <U> Stream<Algo<U>> fMap2Stream(Func<T, Stream<Algo<U>>> f) {
+	public <U> Stream<Uni<U>> fMap2Stream(Func<T, Stream<Uni<U>>> f) {
 		
 		try {
 			return f.apply(object);
@@ -58,7 +58,7 @@ public class Success<T> extends Algo<T> {
 	 * returns Failure if false, Success if true 
 	 */
 	@Override
-	public Algo<T> filter(Pred<T> p) {
+	public Uni<T> filter(Pred<T> p) {
 		try {
 			if (p.test(object)) 
 				return new Success<T>(object);
@@ -77,7 +77,7 @@ public class Success<T> extends Algo<T> {
 	 * @return
 	 */
 	@Override
-	public Algo<T> set(Cons<T> c) {
+	public Uni<T> set(Cons<T> c) {
 		try {
 			c.accept(object);
 		} catch (Exception e) {
@@ -112,10 +112,10 @@ public class Success<T> extends Algo<T> {
 	 * An utility method for implementing 'liberal' switch-case 
 	 * (liberal - do not break)
 	 * The consumer only consumes the object when the 
-	 * predicate is true, otherwise returns this
+	 * predicate is true
 	 */
 	@Override
-	public Algo<T> select(Pred<T> p, Cons<T> c) {
+	public Uni<T> select(Pred<T> p, Cons<T> c) {
 		try {
 			if (p.test(object)) 
 				return set(c);
