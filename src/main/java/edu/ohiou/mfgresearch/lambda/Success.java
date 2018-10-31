@@ -14,7 +14,7 @@ public class Success<T> extends Uni<T> {
 	}
 
 	@Override
-	public Success<T> onFailure(Consumer<Exception> c) {
+	public Success<T> onFailure(Cons<Exception> c) {
 		return this;
 	}
 
@@ -88,8 +88,12 @@ public class Success<T> extends Uni<T> {
 
 
 	@Override
-	public void onSuccess(Consumer<T> c) {
-		c.accept(object);
+	public void onSuccess(Cons<T> c) {
+		try {
+			c.accept(object);
+		} catch (Exception e) {
+			//this is a dead end, please do not use a consumer which is too heavy
+		}
 	}
 	
 	/**

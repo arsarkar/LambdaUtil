@@ -16,8 +16,12 @@ public class Failure<T> extends Uni<T> {
 	}
 
 	@Override
-	public Failure<T> onFailure(Consumer<Exception> c) {
-		c.accept(exception);
+	public Failure<T> onFailure(Cons<Exception> c) {
+		try {
+			c.accept(exception);
+		} catch (Exception e) {
+			return new Failure<T>(exception);
+		}
 		return new Failure<T>(exception);
 	}
 
@@ -55,7 +59,7 @@ public class Failure<T> extends Uni<T> {
 	}
 
 	@Override
-	public void onSuccess(Consumer<T> c) {
+	public void onSuccess(Cons<T> c) {
 		//do nothing
 	}
 

@@ -49,9 +49,9 @@ public abstract class Uni<T> {
 
 	public abstract Uni<T> select(Pred<T> p, Cons<T> c);
 	
-	public abstract Uni<T> onFailure(Consumer<Exception> c);
+	public abstract Uni<T> onFailure(Cons<Exception> c);
 	
-	public abstract void onSuccess(Consumer<T> c);
+	public abstract void onSuccess(Cons<T> c);
 	
 	public abstract boolean isSuccess();
 	

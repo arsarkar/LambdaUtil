@@ -1,13 +1,12 @@
 package edu.ohiou.mfgresearch.lambda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.hamcrest.core.IsInstanceOf;
 
 import edu.ohiou.mfgresearch.lambda.functions.Cons;
 import edu.ohiou.mfgresearch.lambda.functions.Func;
@@ -43,6 +42,20 @@ public class Omni<T> {
 		return new Omni<T>(set);
 	}
 
+	/**
+	 * Utility constructor accepting an array of items (declared as varag)
+	 * internally wraps each item with Algo
+	 * @param collection
+	 */
+	public static <T> Omni<T> of(T... collection){
+		List<Uni<T>> set =
+				Arrays.asList(collection).stream()
+				.map(Uni::of)
+				.collect(Collectors.toList());
+		return new Omni<T>(set);
+	}
+
+	
 	/**
 	 * Returns an empty Omni, which is represented
 	 * by just one Failure
@@ -143,7 +156,29 @@ public class Omni<T> {
 //			 .map(o->o.set(c));
 		return this;
 	}
+	
+	/**
+	 * Monadic select cons
+	 * applies the given function on each element if the predicate is true
+	 * @param p
+	 * @param f
+	 * @return
+	 */
+	public Omni<T> selectAlt(Pred<T> p, Cons<T> c1, Cons<T> c2){
 
+		for(Uni<T> o: algos){
+				if(o instanceof Success){
+					if(o.filter(p) instanceof Success){
+						o.set(c1);	
+					}
+					else{
+						o.set(c2);
+					}
+				}
+			}
+		return this;
+	}
+	
 	/**
 	 * Monadic select map
 	 * applies the given function on each element if the predicate is true
@@ -204,7 +239,7 @@ public class Omni<T> {
 	 * @return
 	 */
 	public Omni<T> add(Omni<T> omni){
-		algos.addAll(omni.toList());
+		algos.addAll(omni.algos);
 		return new Omni<T>(algos);
 	}
 
@@ -212,7 +247,24 @@ public class Omni<T> {
 		return algos.stream();
 	}
 
-	public List<Uni<T>> toList(){
-		return algos;
+	/**
+	 * return the list of the objects of generic type
+	 * @return
+	 */
+	public List<T> toList(){
+		List<T> list = new LinkedList<T>();
+		algos.forEach(u->list.add(u.get()));
+		return list;
+	}
+	
+	/**
+	 * This is an end method, returns nothing
+	 * Only failed uni are thrown to consumer.
+	 * @param c
+	 */
+	public void onFailure(Cons<Exception> c){
+				algos.stream()
+				.filter(a->!a.isSuccess())
+				.forEach(a->a.onFailure(c));
 	}
 }
