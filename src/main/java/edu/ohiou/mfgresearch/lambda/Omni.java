@@ -267,4 +267,8 @@ public class Omni<T> {
 				.filter(a->!a.isSuccess())
 				.forEach(a->a.onFailure(c));
 	}
+
+	public boolean contains(T element) {
+		return element==null?false:toList().contains(element);
+	}
 }
