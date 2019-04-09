@@ -129,5 +129,23 @@ public class Success<T> extends Uni<T> {
 			return this;
 		}
 	}
+	
+	/**
+	 * An utility method for implementing 'liberal' switch-case 
+	 * (liberal - do not break)
+	 * The consumer only consumes the object when the 
+	 * predicate is true
+	 */
+	@Override
+	public Uni<T> selectMap(Pred<T> p, Func<T, T> f) {
+		try {
+			if (p.test(object)) 
+				return map(f);
+			else
+				return this;
+		} catch (Exception e) {
+			return this;
+		}
+	}
 
 }

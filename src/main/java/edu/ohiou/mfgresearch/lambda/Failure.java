@@ -74,5 +74,16 @@ public class Failure<T> extends Uni<T> {
 		return new Failure<T>(exception);
 	}
 	
+	/**
+	 * An utility method for implementing 'liberal' switch-case 
+	 * (liberal - do not break)
+	 * The consumer only consumes the object when the 
+	 * predicate is true
+	 */
+	@Override
+	public Uni<T> selectMap(Pred<T> p, Func<T, T> f) {
+		return new Failure<T>(exception);
+	}
+	
 
 }

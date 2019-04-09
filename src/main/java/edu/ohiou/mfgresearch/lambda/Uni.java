@@ -49,6 +49,8 @@ public abstract class Uni<T> {
 
 	public abstract Uni<T> select(Pred<T> p, Cons<T> c);
 	
+	public abstract Uni<T> selectMap(Pred<T> p, Func<T, T> f);
+	
 	public abstract Uni<T> onFailure(Cons<Exception> c);
 	
 	public abstract void onSuccess(Cons<T> c);
