@@ -186,16 +186,19 @@ public class Omni<T> {
 	 * @param f
 	 * @return
 	 */
-	public <R> Omni<R> selectMap(Pred<T> p, Func<T, R> f){
-		List<Uni<R>> res = new LinkedList<Uni<R>>();
-				for(Uni<T> o: algos){
-					if(o instanceof Success){
-						if(o.filter(p) instanceof Success){
-							res.add(o.map(f));	
-						}
-					}
+	public Omni<T> selectMap(Pred<T> p, Func<T, T> f){
+		List<Uni<T>> res = new LinkedList<Uni<T>>();
+		for(Uni<T> o: algos){
+			if(o instanceof Success){
+				if(o.filter(p) instanceof Success){
+					res.add(o.map(f));	
 				}
-		return new Omni<R>(res);
+				else{
+					res.add(o);
+				}
+			}
+		}		
+		return new Omni<T>(res);
 	}
 	
 	/**

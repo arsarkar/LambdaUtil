@@ -173,4 +173,22 @@ public class OmniTest {
 		.onSuccess(i->System.out.println("Element matching predicate = "+ i));
 		;	
 	}
+	
+	@Test
+	public void omniSelect(){
+		List<String> listOfStrings = new LinkedList<String>();
+		listOfStrings.add("1");
+		listOfStrings.add("-2");
+		listOfStrings.add("3");
+		listOfStrings.add("-4");
+		listOfStrings.add("5");
+		listOfStrings.add("6");
+		listOfStrings.add("-3");
+
+		Omni.of(listOfStrings)
+			.selectMap(i->Integer.parseInt(i)<0, i->"Negative")
+			.selectMap(i->Integer.parseInt(i)>=0, i->"Positive")
+			.set(o->System.out.println(o))
+		;	
+	}
 }
