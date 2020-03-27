@@ -48,6 +48,12 @@ Uni.of(()->new String("Hello, world!"));
     ```
     Uni.of("Hello, world!").fMap(s->Omni.of(s.split(",")));
     ```  
+    
+  * **set**:
+    `set` applies an instance of `Cons` (consumer) to the object and returns the same object, wrapped in `Uni`. This is a utility method, which does not change the object at all. However, the object may be decorated by setting its properties. This functor may also be used to perform additional tasks, which may require the object but do not necessarily change it.        
+    ```
+    Uni.of(new File()).fMap(s->Omni.of(s.split(",")));
+    ```  
 #### Selection
   * **filter**: 
   `filter` applies an instance of `Pred` interface and returns the same `Uni` object if the supplied predicate succeeds. It returns a `Failure` object if the predicates fails.
@@ -67,7 +73,33 @@ Uni.of(()->new String("Hello, world!"));
   * **selectMap**: 
   `selectMap` applies an instance of `Pred` (predicate) interface and then passes the object to an instance of `Func` (function) if the supplied predicate succeeds. It returns the object, which is returned by the function, after wrapping it in `Uni`. It returns the same `Uni` object and does not pass the object to the given function if the predicate fails.
     ```
-		Uni.of(5)
-			.select(i->i%2!=0, i->i+1);
+    Uni.of(5)
+       .select(i->i%2!=0, i->i+1);
     (returns Uni<6>)   
     ``` 
+#### Error handling
+  * **onFailure**: 
+  `onFailure` accepts an instance of `Cons` and passes the exception object to it if occurs in the preceding invocations of functors. The consumer is never applied if no exception occurs.
+    ```
+    Uni.of(5)
+       .map(i->i/0)
+       .onFailure(e->System.out.println("ArithmeticException has occurred!"));
+    ``` 
+  * **onSucess**: 
+  `onSuccess` accepts an instance of `Cons` and passes the object to it if no exception occurs in the preceding invocations of functors. The consumer is never applied if any exception occurs.
+    ```
+    Uni.of(5)
+       .map(i->i/n)
+       .onFailure(e->System.out.println("ArithmeticException has occurred!"))
+       .onSuccess(i->System.out.println("Division is performed successfully"));
+    (returns Uni<6>)   
+    ``` 
+    
+#### Getters
+  * **get**: 
+  `get` returns the object, which is wrapped in the `Uni`. This method breaks the chain and should be used to assign the result of the operations in a variable at the end of the chain. 
+    ```
+    Double factorial5 = Uni.of(5)
+   			    .map(i->Math.sqrt(5))
+			    .get()
+    ```    
